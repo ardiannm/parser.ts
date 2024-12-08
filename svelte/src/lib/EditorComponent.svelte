@@ -30,6 +30,7 @@ A3 :: 1
 	let prevColumn = column;
 
 	function handleKey(event: KeyboardEvent) {
+		renderCursor = true;
 		const input = event.key;
 		if (input === 'ArrowRight') {
 			event.preventDefault();
@@ -95,43 +96,53 @@ A3 :: 1
 		text = text.substring(0, cursor - 1) + text.substring(cursor);
 	}
 
-	const render = () => (renderCursor = !renderCursor);
-
-	onMount(render);
-
 	$effect(() => updatePosition());
 </script>
 
 <div class="editor">
 	<div class="todos">
-		<h4>todo</h4>
+		<div>todo</div>
+
+		<br />
+
 		<div class="todo">
-			<span class="checkmark"> ● </span> update position on window resize
+			<span class="check"> ● </span> update position on window resize
 		</div>
 		<div class="todo">
-			<span class="checkmark"> ● </span> render diagnostic spans on top of the text
+			<span class="check"> ● </span> render diagnostic spans on top of the text
 		</div>
 		<div class="todo">
-			<span class="checkmark"> ● </span> fix the issue with rendering spaces
+			<span class="check"> ● </span> fix the issue with rendering spaces
 		</div>
 		<div class="todo">
-			<span class="checkmark"> ● </span> edit text on keyboard event
+			<span class="check"> ● </span> edit text on keyboard event
 		</div>
 		<div class="todo">
-			<span class="checkmark"> ● </span> fix the issue with not rendering bad character diagnostics
+			<span class="check"> ● </span> fix the issue with not rendering bad character diagnostics
 		</div>
 		<div class="todo">
-			<span class="checkmark"> </span> add line numbers
+			<span class="check"> ● </span> fix the issue with not rendering zero length tokens
 		</div>
 		<div class="todo">
-			<span class="checkmark"> </span> blinking cursor animation
+			<span class="check"> ● </span> render cursor on focus and remove on blur
+		</div>
+		<div class="todo">
+			<span class="check"> </span> add line numbers
+		</div>
+		<div class="todo">
+			<span class="check"> </span> blinking cursor animation
 		</div>
 	</div>
 
 	<br />
 	<br />
 
-	<div class="space highlight">
+	<div
+		class="space highlight"
+		onfocus={() => (renderCursor = true)}
+		onblur={() => (renderCursor = false)}
+		tabindex="-1"
+	>
 		{#each lines as line, i}
 			<span id={`line-${i + 1}`} class="line">
 				{#each line.getTokens() as token, j}
@@ -175,7 +186,9 @@ A3 :: 1
 	<br />
 	<br />
 
-	<h4>tokens</h4>
+	<div>tokens</div>
+
+	<br />
 
 	<div class="tokens">
 		{#each tree.getTokens() as token, i}
@@ -211,14 +224,6 @@ A3 :: 1
 		flex-direction: row;
 		box-sizing: border-box;
 	}
-	.end-of-file-token,
-	.line-break-trivia,
-	.space-trivia {
-		display: flex;
-		white-space: pre;
-		width: 1px;
-		height: 1em;
-	}
 	.tokens .space-trivia {
 		background-color: #ccbfee;
 	}
@@ -240,7 +245,7 @@ A3 :: 1
 		display: flex;
 		flex-direction: row;
 	}
-	.checkmark {
+	.check {
 		display: flex;
 		width: 17px;
 		height: 17px;
@@ -257,6 +262,8 @@ A3 :: 1
 		display: inline-block;
 		width: fit-content;
 		height: fit-content;
+		min-width: 1px;
+		white-space: pre;
 	}
 	.address {
 		margin: 6px;
